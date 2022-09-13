@@ -1,0 +1,104 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Transform: AWS::Serverless-2016-10-31
+Description: Primary event bus for the foodie2ue serverless backend
+
+Parameters:
+  Stage:
+    Type: String
+  Service:
+    Type: String
+
+Resources:
+  MainEventBus:
+    Type: AWS::Events::EventBus
+    Properties:
+      Name: !Sub ${Service}-${Stage}-bus
+
+  EventBusPolicy:
+    Type: AWS::IAM::ManagedPolicy
+    Properties:
+      ManagedPolicyName: !Sub ${Service}-${Stage}-eventbridge-publisher
+      PolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Sid: EventBridgePolicy
+            Effect: Allow
+            Action:
+              - events:PutEvents
+              - events:PutTargets
+              - events:PutRule
+            Resource:
+              - !GetAtt MainEventBus.Arn
+              - !Sub arn:aws:events:${AWS::AccountId}:${AWS::Region}:rule/[*/]*
+
+  LogsRule:
+    Type: AWS::Events::Rule
+    Properties:
+      EventBusName: !Ref MainEventBus
+      EventPattern:
+        account:
+          - !Ref AWS::AccountId
+      Targets:
+        - Arn: !GetAtt LogGroupForEvents.Arn
+          Id: LogTarget
+
+  LogGroupForEvents:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Sub /aws/${Service}-${Stage}/all-events
+      RetentionInDays: 7
+
+  LogGroupForEventsPolicy:
+    Type: AWS::Logs::ResourcePolicy
+    Properties:
+      PolicyName: EventBridgeToCWLogsPolicy
+      PolicyDocument: !Sub >
+        {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Sid": "EventBridgetoCWLogsCreateLogStreamPolicy",
+              "Effect": "Allow",
+              "Principal": {
+                "Service": [
+                  "events.amazonaws.com"
+                ]
+              },
+              "Action": [
+                "logs:CreateLogStream"
+              ],
+              "Resource": [
+                "${LogGroupForEvents.Arn}"
+              ]
+            },
+            {
+              "Sid": "EventBridgetoCWLogsPutLogEventsPolicy",
+              "Effect": "Allow",
+              "Principal": {
+                "Service": [
+                  "events.amazonaws.com"
+                ]
+              },
+              "Action": [
+                "logs:PutLogEvents"
+              ],
+              "Resource": [
+                "${LogGroupForEvents.Arn}"
+              ],
+              "Condition": {
+                "ArnEquals": {"AWS:SourceArn": "${LogsRule.Arn}"}
+              }
+            }
+          ]
+        }
+
+Outputs:
+  EventBusArn:
+    Description: Application EventBus ARN
+    Value:
+      Fn::GetAtt:
+        - MainEventBus
+        - Arn
+  EventBusPolicyArn:
+    Description: ARN for the IAM ManagedPolicy to publish to the eventbus
+    Value: !Ref EventBusPolicy

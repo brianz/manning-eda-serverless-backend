@@ -1,0 +1,76 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Transform: AWS::Serverless-2016-10-31
+Description: Foodie2ue serverless backend.
+
+Parameters:
+  Stage:
+    Type: String
+    Default: dev
+  Service:
+    Type: String
+    Default: foodie2ue
+
+Resources:
+  EventBus:
+    Type: AWS::Serverless::Application
+    Properties:
+      Location: eventbus/template.yaml
+      Parameters:
+        Stage: !Ref Stage
+        Service: !Ref Service
+      Tags:
+        service: !Ref Service
+        stage: !Ref Stage
+
+  Security:
+    Type: AWS::Serverless::Application
+    Properties:
+      Location: security/template.yaml
+      Parameters:
+        EventBusPolicyArn: !GetAtt EventBus.Outputs.EventBusPolicyArn
+      Tags:
+        service: !Ref Service
+        stage: !Ref Stage
+
+  NotificationsService:
+    Type: AWS::Serverless::Application
+    Properties:
+      Location: notifications/template.yaml
+      Tags:
+        service: !Ref Service
+        stage: !Ref Stage
+
+  # OrderWorkflow:
+  #   Type: AWS::Serverless::Application
+  #   Properties:
+  #     Location: workflow/template.yaml
+  #     Parameters:
+  #       OrderTableName: !GetAtt DynamoDB.Outputs.DynamoDBTableName
+  #       SubscriptionEmail: !Ref SubscriptionEmail
+
+  # ApiIntegrations:
+  #   Type: AWS::Serverless::Application
+  #   Properties:
+  #     Location: api-integrations/template.yaml
+  #     Parameters:
+  #       OrderTableName: !GetAtt DynamoDB.Outputs.DynamoDBTableName
+  #       OrderWorkflowSfnArn: !GetAtt OrderWorkflow.Outputs.OrderWorkflowSfnArn
+  #       OrderWorkflowSfnName: !GetAtt OrderWorkflow.Outputs.OrderWorkflowSfnName
+
+  # Api:
+  #   Type: AWS::Serverless::Application
+  #   Properties:
+  #     Location: api/template.yaml
+  #     Parameters:
+  #       GetOrders: !GetAtt ApiIntegrations.Outputs.GetOrders
+  #       PostOrders: !GetAtt ApiIntegrations.Outputs.PostOrders
+  #       GetSingleOrder: !GetAtt ApiIntegrations.Outputs.GetSingleOrder
+  #       UpdateOrder: !GetAtt ApiIntegrations.Outputs.UpdateOrder
+  #       DeleteOrder: !GetAtt ApiIntegrations.Outputs.DeleteOrder
+  #       OrderQueueName: !GetAtt ApiIntegrations.Outputs.OrderQueueName
+  #       OrderQueueArn: !GetAtt ApiIntegrations.Outputs.OrderQueueArn
+
+Outputs:
+  EventBusArn:
+    Description: Application EventBus ARN
+    Value: !GetAtt EventBus.Outputs.EventBusArn
