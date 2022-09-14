@@ -3,27 +3,41 @@ Transform: AWS::Serverless-2016-10-31
 Description: Foodie2ue notification service
 
 Parameters:
-  SESIdentityName:
+  EventBusName:
     Type: String
-    Default: "foodie2ue.com"
 
 Globals:
   Function:
-    Timeout: 5
+    CodeUri: src/
     Runtime: python3.9
+    Timeout: 5
+    Environment:
+      Variables:
+        POWERTOOLS_SERVICE_NAME: notifications
+        LOG_LEVEL: INFO
 
 Resources:
   SendNotificationsFunction:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: src/notifications/
-      Handler: app.handler
+      Handler: handler.handle_notification
+      Layers:
+        - arn:aws:lambda:us-west-2:017000801446:layer:AWSLambdaPowertoolsPython:33
       Policies:
-        - SESCrudPolicy:
-            IdentityName: !Ref SESIdentityName
         - Version: "2012-10-17"
           Statement:
             - Effect: Allow
               Action:
                 - "ses:SendEmail"
+                - "ses:SendRawEmail"
               Resource: "*"
+      Events:
+        NewOrderRule:
+          Type: EventBridgeRule
+          Properties:
+            EventBusName: !Ref EventBusName
+            Pattern:
+              source:
+                - OrderService
+              detail-type:
+                - OrderCreatedEvent

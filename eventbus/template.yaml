@@ -93,6 +93,10 @@ Resources:
         }
 
 Outputs:
+  EventBusName:
+    Description: Tha name of the EventBus
+    Value: !Ref MainEventBus
+
   EventBusArn:
     Description: Application EventBus ARN
     Value:

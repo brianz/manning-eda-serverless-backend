@@ -36,39 +36,11 @@ Resources:
     Type: AWS::Serverless::Application
     Properties:
       Location: notifications/template.yaml
+      Parameters:
+        EventBusName: !GetAtt EventBus.Outputs.EventBusName
       Tags:
         service: !Ref Service
         stage: !Ref Stage
-
-  # OrderWorkflow:
-  #   Type: AWS::Serverless::Application
-  #   Properties:
-  #     Location: workflow/template.yaml
-  #     Parameters:
-  #       OrderTableName: !GetAtt DynamoDB.Outputs.DynamoDBTableName
-  #       SubscriptionEmail: !Ref SubscriptionEmail
-
-  # ApiIntegrations:
-  #   Type: AWS::Serverless::Application
-  #   Properties:
-  #     Location: api-integrations/template.yaml
-  #     Parameters:
-  #       OrderTableName: !GetAtt DynamoDB.Outputs.DynamoDBTableName
-  #       OrderWorkflowSfnArn: !GetAtt OrderWorkflow.Outputs.OrderWorkflowSfnArn
-  #       OrderWorkflowSfnName: !GetAtt OrderWorkflow.Outputs.OrderWorkflowSfnName
-
-  # Api:
-  #   Type: AWS::Serverless::Application
-  #   Properties:
-  #     Location: api/template.yaml
-  #     Parameters:
-  #       GetOrders: !GetAtt ApiIntegrations.Outputs.GetOrders
-  #       PostOrders: !GetAtt ApiIntegrations.Outputs.PostOrders
-  #       GetSingleOrder: !GetAtt ApiIntegrations.Outputs.GetSingleOrder
-  #       UpdateOrder: !GetAtt ApiIntegrations.Outputs.UpdateOrder
-  #       DeleteOrder: !GetAtt ApiIntegrations.Outputs.DeleteOrder
-  #       OrderQueueName: !GetAtt ApiIntegrations.Outputs.OrderQueueName
-  #       OrderQueueArn: !GetAtt ApiIntegrations.Outputs.OrderQueueArn
 
 Outputs:
   EventBusArn:
