@@ -6,11 +6,13 @@ name = "pypi"
 [packages]
 jinja2 = "*"
 boto3 = "*"
+aws-lambda-powertools = "*"
 
 [dev-packages]
 pytest-gitignore = "*"
 flake8 = "*"
 yapf = "*"
+pytest = "*"
 
 [requires]
 python_version = "3.9"

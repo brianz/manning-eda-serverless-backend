@@ -1,4 +1,4 @@
-import renderer
+from notifications import renderer
 
 
 def test_render():
