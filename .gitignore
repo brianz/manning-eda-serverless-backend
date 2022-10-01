@@ -3,3 +3,4 @@
 samconfig.toml
 .envrc
 **/__pycache__
+**/.pytest_cache

@@ -1,0 +1,16 @@
+[[source]]
+url = "https://pypi.org/simple"
+verify_ssl = true
+name = "pypi"
+
+[packages]
+jinja2 = "*"
+boto3 = "*"
+
+[dev-packages]
+pytest-gitignore = "*"
+flake8 = "*"
+yapf = "*"
+
+[requires]
+python_version = "3.9"
