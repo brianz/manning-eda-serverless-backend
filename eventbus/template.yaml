@@ -103,6 +103,7 @@ Outputs:
       Fn::GetAtt:
         - MainEventBus
         - Arn
+
   EventBusPolicyArn:
     Description: ARN for the IAM ManagedPolicy to publish to the eventbus
     Value: !Ref EventBusPolicy

@@ -2,3 +2,4 @@
 .DS_Store
 samconfig.toml
 .envrc
+**/__pycache__
