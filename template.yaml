@@ -35,11 +35,20 @@ Resources:
         service: !Ref Service
         stage: !Ref Stage
 
+  CommonLambdaLayer:
+    Type: AWS::Serverless::Application
+    Properties:
+      Location: services/common-layer/template.yaml
+      Tags:
+        service: !Ref Service
+        stage: !Ref Stage
+
   DriverDispatchService:
     Type: AWS::Serverless::Application
     Properties:
       Location: services/driver-dispatch/template.yaml
       Parameters:
+        CommonLayerARN: !GetAtt CommonLambdaLayer.Outputs.CommonLayerARN
         EventBusName: !GetAtt EventBus.Outputs.EventBusName
       Tags:
         service: !Ref Service
@@ -50,6 +59,7 @@ Resources:
     Properties:
       Location: services/notifications/template.yaml
       Parameters:
+        CommonLayerARN: !GetAtt CommonLambdaLayer.Outputs.CommonLayerARN
         EventBusName: !GetAtt EventBus.Outputs.EventBusName
         DefaultFromAddress: !Ref DefaultFromAddress
       Tags:

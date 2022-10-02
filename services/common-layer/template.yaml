@@ -1,6 +1,6 @@
 AWSTemplateFormatVersion: "2010-09-09"
 Transform: AWS::Serverless-2016-10-31
-Description: Common things for different services
+Description: Common layer for Lambda functions
 
 Resources:
   CommonServicesLayer:
@@ -11,3 +11,8 @@ Resources:
         - python3.9
     Metadata:
       BuildMethod: makefile
+
+Outputs:
+  CommonLayerARN:
+    Description: ARN for the common services Lambda layer
+    Value: !Ref CommonServicesLayer

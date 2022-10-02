@@ -5,6 +5,8 @@ Description: Foodie2ue driver-dispatch service
 Parameters:
   EventBusName:
     Type: String
+  CommonLayerARN:
+    Type: String
 
 Globals:
   Function:
@@ -22,7 +24,7 @@ Resources:
     Properties:
       Handler: handler.handle_driver_dispatch
       Layers:
-        - arn:aws:lambda:us-west-2:017000801446:layer:AWSLambdaPowertoolsPython:33
+        - !Ref CommonLayerARN
       Events:
         OrderUpdatedRule:
           Type: EventBridgeRule

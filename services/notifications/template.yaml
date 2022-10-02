@@ -3,6 +3,8 @@ Transform: AWS::Serverless-2016-10-31
 Description: Foodie2ue notification service
 
 Parameters:
+  CommonLayerARN:
+    Type: String
   EventBusName:
     Type: String
   DefaultFromAddress:
@@ -25,7 +27,7 @@ Resources:
     Properties:
       Handler: handler.handle_notification
       Layers:
-        - arn:aws:lambda:us-west-2:017000801446:layer:AWSLambdaPowertoolsPython:33
+        - !Ref CommonLayerARN
       Policies:
         - Version: "2012-10-17"
           Statement:

@@ -1,7 +1,7 @@
 import os
 import json
 
-from driver_dispatch.powertools import (
+from foodie2ue.powertools import (
     EventBridgeEvent,
     LambdaContext,
     event_source,
