@@ -8,7 +8,7 @@ from notifications.powertools import (
     logger,
 )
 
-from notifications.notifier import SESNotifier, NotifierPayload
+from notifications.notifier import AbstractNotifier, SESNotifier, NotifierPayload
 from notifications.renderer import render_new_order
 
 DEBUG = json.loads(os.environ.get('DEBUG', 'true'))
@@ -27,14 +27,13 @@ def handle_notification(event: EventBridgeEvent, context: LambdaContext) -> None
     if DEBUG and recipient not in ('brianz@gmail.com', 'matt.d.diamond@hotmail.com'):
         recipient = 'brianz@gmail.com'
 
-    text_body, html_body = render_new_order(**event.detail)
+    text_body, html_body = render_new_order(event.detail)
 
     payload = NotifierPayload(
         recipient=recipient,
         text_body=text_body,
         html_body=html_body,
-        from_email='noreply@foodie2ue.com',
         subject='New order notification',
     )
-    with SESNotifier() as notifier:
-        notifier.send(payload)
+    notifier: AbstractNotifier = SESNotifier()
+    notifier.notify(payload)

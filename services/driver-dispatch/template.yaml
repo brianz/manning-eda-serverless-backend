@@ -1,0 +1,37 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Transform: AWS::Serverless-2016-10-31
+Description: Foodie2ue driver-dispatch service
+
+Parameters:
+  EventBusName:
+    Type: String
+
+Globals:
+  Function:
+    CodeUri: src/
+    Runtime: python3.9
+    Timeout: 5
+    Environment:
+      Variables:
+        POWERTOOLS_SERVICE_NAME: driver-dispatch
+        LOG_LEVEL: INFO
+
+Resources:
+  DriverDispatchFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: handler.handle_driver_dispatch
+      Layers:
+        - arn:aws:lambda:us-west-2:017000801446:layer:AWSLambdaPowertoolsPython:33
+      Events:
+        OrderUpdatedRule:
+          Type: EventBridgeRule
+          Properties:
+            EventBusName: !Ref EventBusName
+            Pattern:
+              detail-type:
+                - OrderUpdatedEvent
+              detail:
+                status:
+                  - READY_FOR_PICKUP
+                  - PREPARING

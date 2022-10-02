@@ -5,6 +5,8 @@ Description: Foodie2ue notification service
 Parameters:
   EventBusName:
     Type: String
+  DefaultFromAddress:
+    Type: String
 
 Globals:
   Function:
@@ -15,6 +17,7 @@ Globals:
       Variables:
         POWERTOOLS_SERVICE_NAME: notifications
         LOG_LEVEL: INFO
+        DEFAULT_FROM_ADDRESS: !Ref DefaultFromAddress
 
 Resources:
   SendNotificationsFunction:
@@ -37,7 +40,5 @@ Resources:
           Properties:
             EventBusName: !Ref EventBusName
             Pattern:
-              source:
-                - OrderService
               detail-type:
                 - OrderCreatedEvent

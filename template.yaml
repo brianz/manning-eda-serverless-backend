@@ -9,6 +9,9 @@ Parameters:
   Service:
     Type: String
     Default: foodie2ue
+  DefaultFromAddress:
+    Type: String
+    Default: noreply@foodie2ue.com
 
 Resources:
   EventBus:
@@ -32,12 +35,23 @@ Resources:
         service: !Ref Service
         stage: !Ref Stage
 
+  DriverDispatchService:
+    Type: AWS::Serverless::Application
+    Properties:
+      Location: services/driver-dispatch/template.yaml
+      Parameters:
+        EventBusName: !GetAtt EventBus.Outputs.EventBusName
+      Tags:
+        service: !Ref Service
+        stage: !Ref Stage
+
   NotificationsService:
     Type: AWS::Serverless::Application
     Properties:
-      Location: notifications/template.yaml
+      Location: services/notifications/template.yaml
       Parameters:
         EventBusName: !GetAtt EventBus.Outputs.EventBusName
+        DefaultFromAddress: !Ref DefaultFromAddress
       Tags:
         service: !Ref Service
         stage: !Ref Stage
