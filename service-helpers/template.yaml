@@ -1,0 +1,13 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Transform: AWS::Serverless-2016-10-31
+Description: Common things for different services
+
+Resources:
+  CommonServicesLayer:
+    Type: AWS::Serverless::LayerVersion
+    Properties:
+      ContentUri: layer
+      CompatibleRuntimes:
+        - python3.9
+    Metadata:
+      BuildMethod: makefile
